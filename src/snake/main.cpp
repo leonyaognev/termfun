@@ -3,7 +3,7 @@
 #include <chrono>
 #include <thread>
 
-#include "include/snake.h"
+#include "snake.h"
 
 struct GameUI {
   WINDOW* field;
@@ -84,34 +84,32 @@ void draw(GameUI* ui, const Snake& snake, const Apple& apple) {
 
 int main() {
   GameUI ui = init_ui();
+  GameSnake game;
 
-  Snake snake;
-  Apple apple;
-  Snake::point dir{1, 0};
   bool running = true;
 
   while (running) {
     int ch = getch();
     switch (ch) {
       case KEY_UP:
-        dir = {0, -1};
+        game.userInput(UserAction_s::Up, 0);
         break;
       case KEY_DOWN:
-        dir = {0, 1};
+        game.userInput(UserAction_s::Up, 0);
         break;
       case KEY_LEFT:
-        dir = {-1, 0};
+        game.userInput(UserAction_s::Up, 0);
         break;
       case KEY_RIGHT:
-        dir = {1, 0};
+        game.userInput(UserAction_s::Up, 0);
         break;
       case 'q':
         running = false;
         break;
     }
 
-    snake.move(dir, apple);
-    draw(&ui, snake, apple);
+    game.updateCurrentState();
+    draw(&ui, game.snake, game.apple);
 
     std::this_thread::sleep_for(std::chrono::milliseconds(200));
   }

@@ -3,6 +3,9 @@
     "arguments": [
       "/usr/bin/gcc",
       "-I./src/tui",
+      "-I./src/vendor/logger/",
+      "-I./src/snake/",
+      "-I./src/snake/include/",
       "-I./src/tetris/core_files/figure/include",
       "-I./src/tetris/include",
       "-I./src/tetris",

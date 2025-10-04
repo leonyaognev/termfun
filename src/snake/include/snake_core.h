@@ -9,6 +9,8 @@ constexpr int ROWS = 20;
 constexpr int COLS = 10;
 };  // namespace snakeSize
 
+enum class CollisionType { None, Apple, Wall, Self };
+
 class Apple {
  private:
   int x;
@@ -32,18 +34,13 @@ class Snake {
  private:
   std::deque<point> body;
 
-  int checkCollision(Apple& a);
+  CollisionType checkCollision(const Apple& a);
   void grow(point& p);
 
  public:
   Snake();
 
-  void move(point& dir, Apple& a);
+  CollisionType move(point& dir, const Apple& a);
   inline std::deque<point> getBody() const noexcept { return body; };
   inline point getHead() const noexcept { return body.front(); }
-};
-
-class penis {
- public:
-  const char* what() { return "hui zalupa penis"; }
 };
