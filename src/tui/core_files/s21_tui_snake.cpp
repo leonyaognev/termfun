@@ -1,0 +1,119 @@
+#include <ncurses.h>
+
+#include <chrono>
+#include <thread>
+
+#include "../snake/include/snake.h"
+
+struct GameUI {
+  WINDOW* field;
+  WINDOW* counter;
+};
+
+static void draw_fancy_box(WINDOW* w) {
+  wborder(w, ACS_VLINE, ACS_VLINE, ACS_HLINE, ACS_HLINE, ACS_ULCORNER,
+          ACS_URCORNER, ACS_LLCORNER, ACS_LRCORNER);
+}
+
+static void draw_block(WINDOW* w, int y, int x, int color_pair) {
+  wattron(w, COLOR_PAIR(color_pair) | A_REVERSE);
+  mvwaddch(w, y, x, ACS_CKBOARD);
+  mvwaddch(w, y, x + 1, ACS_CKBOARD);
+  wattroff(w, COLOR_PAIR(color_pair) | A_REVERSE);
+}
+
+GameUI init_ui() {
+  setlocale(LC_ALL, "");
+  initscr();
+  cbreak();
+  noecho();
+  keypad(stdscr, TRUE);
+  curs_set(0);
+  nodelay(stdscr, TRUE);
+  ESCDELAY = 0;
+
+  if (has_colors()) {
+    start_color();
+    use_default_colors();
+    init_pair(1, COLOR_GREEN, -1);
+    init_pair(2, COLOR_YELLOW, -1);
+    init_pair(3, COLOR_RED, -1);
+  }
+
+  GameUI ui;
+  ui.field = newwin(snakeSize::ROWS + 2, snakeSize::COLS * 2 + 2, 1, 1);
+  ui.counter = newwin(5, 20, 1, snakeSize::COLS * 2 + 4);
+  return ui;
+}
+
+void deinit_ui(GameUI* ui) {
+  delwin(ui->field);
+  delwin(ui->counter);
+  endwin();
+}
+
+static void draw_scoreboard(WINDOW* counter, const Snake& snake) {
+  werase(counter);
+  draw_fancy_box(counter);
+
+  wattron(counter, COLOR_PAIR(3) | A_BOLD);
+  mvwprintw(counter, 1, 2, "Length: %d", (int)snake.getBody().size());
+  wattroff(counter, COLOR_PAIR(3) | A_BOLD);
+
+  wrefresh(counter);
+}
+
+void draw(GameUI* ui, const Snake& snake, const Apple& apple) {
+  werase(ui->field);
+  draw_fancy_box(ui->field);
+
+  draw_block(ui->field, apple.getY() + 1, apple.getX() * 2 + 1, 3);
+
+  bool first = true;
+  for (auto& p : snake.getBody()) {
+    int color = first ? 1 : 2;
+    draw_block(ui->field, p.y + 1, p.x * 2 + 1, color);
+    first = false;
+  }
+
+  wrefresh(ui->field);
+  draw_scoreboard(ui->counter, snake);
+}
+
+int main() {
+  GameUI ui = init_ui();
+
+  Snake snake;
+  Apple apple;
+  Snake::point dir{1, 0};
+  bool running = true;
+
+  while (running) {
+    int ch = getch();
+    switch (ch) {
+      case KEY_UP:
+        dir = {0, -1};
+        break;
+      case KEY_DOWN:
+        dir = {0, 1};
+        break;
+      case KEY_LEFT:
+        dir = {-1, 0};
+        break;
+      case KEY_RIGHT:
+        dir = {1, 0};
+        break;
+      case 'q':
+        running = false;
+        break;
+    }
+
+    snake.move(dir, apple);
+    draw(&ui, snake, apple);
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(200));
+  }
+
+  deinit_ui(&ui);
+  return 0;
+}
