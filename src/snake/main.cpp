@@ -95,13 +95,13 @@ int main() {
         game.userInput(UserAction_s::Up, 0);
         break;
       case KEY_DOWN:
-        game.userInput(UserAction_s::Up, 0);
+        game.userInput(UserAction_s::Down, 0);
         break;
       case KEY_LEFT:
-        game.userInput(UserAction_s::Up, 0);
+        game.userInput(UserAction_s::Left, 0);
         break;
       case KEY_RIGHT:
-        game.userInput(UserAction_s::Up, 0);
+        game.userInput(UserAction_s::Right, 0);
         break;
       case 'q':
         running = false;

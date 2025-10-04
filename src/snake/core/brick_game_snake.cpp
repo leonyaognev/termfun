@@ -5,6 +5,7 @@
 
 #include "logger.h"
 #include "snake.h"
+#include "snake_core.h"
 
 // =======================
 // scoreManager
@@ -82,8 +83,15 @@ void GameSnake::userInput(UserAction_s action, bool hold) {
 
 void GameSnake::updateCurrentState() {
   CollisionType collision = snake.move(dir, apple);
-  if (collision == CollisionType::Wall || collision == CollisionType::Self) {
-    apple = Apple();
-    ++score;
+  switch (collision) {
+    case CollisionType::Wall:
+    case CollisionType::Self:
+      break;
+    case CollisionType::Apple:
+      apple = Apple();
+      ++score;
+      break;
+    default:
+      break;
   }
 }
