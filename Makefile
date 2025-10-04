@@ -21,7 +21,7 @@ BUILD_DIR   = ./build
 TETRIS_HEADERS = -I$(TETRIS_DIR)/core_files/figure/include \
                  -I$(TETRIS_DIR)/include \
                  -I$(TETRIS_DIR)
-SNAKE_HEADERS  = -I$(SNAKE_DIR)/include
+SNAKE_HEADERS  = -I$(SNAKE_DIR)/include -I$(SNAKE_DIR)/ -I./src/vendor/logger/
 TUI_HEADERS    = -I$(TUI_DIR)
 
 # ================================
@@ -30,7 +30,7 @@ TUI_HEADERS    = -I$(TUI_DIR)
 SRC_TETRIS := $(wildcard $(TETRIS_DIR)/core_files/figure/core/*.c \
                           $(TETRIS_DIR)/core_files/*.c)
 SRC_SNAKE  := $(wildcard $(SNAKE_DIR)/core/*.cpp $(SNAKE_DIR)/*.cpp $(SNAKE_DIR)/helpers/*.cpp)
-SRC_TUI    := $(wildcard $(TUI_DIR)/core_files/*.c $(TUI_DIR)/helpers/*.c)
+SRC_TUI    := $(wildcard $(TUI_DIR)/core_files/*.c $(TUI_DIR)/helpers/*.c $(TUI_DIR)/helpers/*.cpp $(TUI_DIR)/core_files/*.cpp)
 SRC_CORE   := $(wildcard $(CORE_DIR)/*.c)
 
 TEST_SRC   := $(wildcard $(TEST_DIR)/*.c)
@@ -40,7 +40,7 @@ TEST_SRC   := $(wildcard $(TEST_DIR)/*.c)
 # ================================
 OBJ_TETRIS := $(patsubst $(SRC_DIR)/%.c, $(BUILD_DIR)/obj/%.o, $(SRC_TETRIS))
 OBJ_SNAKE  := $(patsubst $(SRC_DIR)/%.cpp, $(BUILD_DIR)/obj/%.o, $(SRC_SNAKE))
-OBJ_TUI    := $(patsubst $(SRC_DIR)/%.c, $(BUILD_DIR)/obj/%.o, $(SRC_TUI))
+OBJ_TUI    := $(patsubst $(SRC_DIR)/%.cpp, $(BUILD_DIR)/obj/%.o, $(SRC_TUI))
 OBJ_GCOV   := $(patsubst $(SRC_DIR)/%.c, $(BUILD_DIR)/gcov/%.o, $(SRC_TETRIS))
 
 # ================================
@@ -106,9 +106,9 @@ $(SNAKE): mkbuild $(OBJ_SNAKE)
 	@ar rcs $@ $(OBJ_SNAKE)
 
 # ---------------- TUI ----------------
-$(BUILD_DIR)/obj/tui/%.o: $(TUI_DIR)/%.c
+$(BUILD_DIR)/obj/tui/%.o: $(TUI_DIR)/%.cpp
 	@mkdir -p $(dir $@)
-	@$(CC) $(TUI_HEADERS) $(TETRIS_HEADERS) $(CFLAGS) -c $< -o $@
+	@$(CC) $(TUI_HEADERS) $(TETRIS_HEADERS) $(SNAKE_HEADERS) $(CFLAGS) -c $< -o $@
 	$(eval DONE_TUI := $(shell expr $(DONE_TUI) + 1))
 	@$(call print_bar,$(DONE_TUI),$(TOTAL_TUI),TUI compilation: )
 
@@ -117,7 +117,7 @@ $(TUI): mkbuild $(OBJ_TUI)
 
 # ---------------- Install ----------------
 install: $(TETRIS) $(SNAKE) $(TUI)
-	@$(CC) $(CFLAGS) $(TETRIS_HEADERS) $(TUI_HEADERS) $(SNAKE_HEADERS) ./tetris/main.c \
+	@$(CC) $(CFLAGS) $(TETRIS_HEADERS) $(TUI_HEADERS) $(SNAKE_HEADERS) ./tetris/main.cpp \
 		-L$(BUILD_DIR)/ -l:s21_tui_lib.a \
 		-L$(BUILD_DIR)/ -l:s21_tetris_logics_lib.a \
 		-L$(BUILD_DIR)/ -l:s21_snake_lib.a \

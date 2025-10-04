@@ -1,14 +1,9 @@
 #include <ncurses.h>
 
 #include <chrono>
-#include <thread>
 
-#include "../snake/include/snake.h"
-
-struct GameUI {
-  WINDOW* field;
-  WINDOW* counter;
-};
+#include "snake.h"
+#include "snake_tui.h"
 
 static void draw_fancy_box(WINDOW* w) {
   wborder(w, ACS_VLINE, ACS_VLINE, ACS_HLINE, ACS_HLINE, ACS_ULCORNER,
@@ -18,11 +13,11 @@ static void draw_fancy_box(WINDOW* w) {
 static void draw_block(WINDOW* w, int y, int x, int color_pair) {
   wattron(w, COLOR_PAIR(color_pair) | A_REVERSE);
   mvwaddch(w, y, x, ACS_CKBOARD);
-  mvwaddch(w, y, x + 1, ACS_CKBOARD);
+  mvwaddch(w, y, x + 1, ACS_CKBOARD);  // два символа шириной
   wattroff(w, COLOR_PAIR(color_pair) | A_REVERSE);
 }
 
-GameUI init_ui() {
+GameUI snake_init_ui() {
   setlocale(LC_ALL, "");
   initscr();
   cbreak();
@@ -35,9 +30,9 @@ GameUI init_ui() {
   if (has_colors()) {
     start_color();
     use_default_colors();
-    init_pair(1, COLOR_GREEN, -1);
-    init_pair(2, COLOR_YELLOW, -1);
-    init_pair(3, COLOR_RED, -1);
+    init_pair(1, COLOR_GREEN, -1);   // змейка голова
+    init_pair(2, COLOR_YELLOW, -1);  // змейка тело
+    init_pair(3, COLOR_RED, -1);     // яблоко
   }
 
   GameUI ui;
@@ -46,7 +41,7 @@ GameUI init_ui() {
   return ui;
 }
 
-void deinit_ui(GameUI* ui) {
+void snake_deinit_ui(GameUI* ui) {
   delwin(ui->field);
   delwin(ui->counter);
   endwin();
@@ -67,8 +62,10 @@ void draw(GameUI* ui, const Snake& snake, const Apple& apple) {
   werase(ui->field);
   draw_fancy_box(ui->field);
 
+  // Яблоко
   draw_block(ui->field, apple.getY() + 1, apple.getX() * 2 + 1, 3);
 
+  // Змейка
   bool first = true;
   for (auto& p : snake.getBody()) {
     int color = first ? 1 : 2;
@@ -78,42 +75,4 @@ void draw(GameUI* ui, const Snake& snake, const Apple& apple) {
 
   wrefresh(ui->field);
   draw_scoreboard(ui->counter, snake);
-}
-
-int main() {
-  GameUI ui = init_ui();
-
-  Snake snake;
-  Apple apple;
-  Snake::point dir{1, 0};
-  bool running = true;
-
-  while (running) {
-    int ch = getch();
-    switch (ch) {
-      case KEY_UP:
-        dir = {0, -1};
-        break;
-      case KEY_DOWN:
-        dir = {0, 1};
-        break;
-      case KEY_LEFT:
-        dir = {-1, 0};
-        break;
-      case KEY_RIGHT:
-        dir = {1, 0};
-        break;
-      case 'q':
-        running = false;
-        break;
-    }
-
-    snake.move(dir, apple);
-    draw(&ui, snake, apple);
-
-    std::this_thread::sleep_for(std::chrono::milliseconds(200));
-  }
-
-  deinit_ui(&ui);
-  return 0;
 }
