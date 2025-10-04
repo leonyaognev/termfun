@@ -53,5 +53,5 @@ class GameSnake {
 
  private:
   scoreManager score;
-  Snake::point dir;
+  Snake::point dir = {1, 0};
 };

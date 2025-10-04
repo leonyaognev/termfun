@@ -4,15 +4,15 @@
 
 #include "snake.h"
 
-struct GameUI {
+struct SnakeUI {
   WINDOW* field;
   WINDOW* counter;
 };
 
-GameUI snake_init_ui(void);
+SnakeUI snake_init_ui(void);
 
-void snake_deinit_ui(GameUI* ui);
+void snake_deinit_ui(SnakeUI* ui);
 
-void draw(GameUI* ui, const Snake& snake, const Apple& apple);
+void draw(SnakeUI* ui, const Snake& snake, const Apple& apple);
 
 int snake_recive_input(GameSnake& game);

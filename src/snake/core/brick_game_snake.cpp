@@ -1,15 +1,12 @@
 #include <cstdlib>
 #include <filesystem>
 #include <fstream>
+#include <iostream>
 #include <stdexcept>
 
 #include "logger.h"
 #include "snake.h"
 #include "snake_core.h"
-
-// =======================
-// scoreManager
-// =======================
 
 scoreManager::scoreManager() : score(0), highScore(0), level(0), speed(1) {
   const char* home = std::getenv("HOME");
@@ -50,13 +47,9 @@ void scoreManager::operator++() {
   }
 }
 
-// =======================
-// GameSnake
-// =======================
-
 void GameSnake::userInput(UserAction_s action, bool hold) {
   log_info("userInput called with action: %d", static_cast<int>(action));
-  (void)hold;  // suppress unused warning
+  (void)hold;
 
   switch (action) {
     case UserAction_s::Start:

@@ -38,10 +38,11 @@ TEST_SRC   := $(wildcard $(TEST_DIR)/*.c)
 # ================================
 # Objects
 # ================================
-OBJ_TETRIS := $(patsubst $(SRC_DIR)/%.c, $(BUILD_DIR)/obj/%.o, $(SRC_TETRIS))
-OBJ_SNAKE  := $(patsubst $(SRC_DIR)/%.cpp, $(BUILD_DIR)/obj/%.o, $(SRC_SNAKE))
-OBJ_TUI    := $(patsubst $(SRC_DIR)/%.cpp, $(BUILD_DIR)/obj/%.o, $(SRC_TUI))
-OBJ_GCOV   := $(patsubst $(SRC_DIR)/%.c, $(BUILD_DIR)/gcov/%.o, $(SRC_TETRIS))
+OBJ_TETRIS   := $(patsubst $(SRC_DIR)/%.c, $(BUILD_DIR)/obj/%.o, $(SRC_TETRIS))
+OBJ_SNAKE    := $(patsubst $(SRC_DIR)/%.cpp, $(BUILD_DIR)/obj/%.o, $(SRC_SNAKE))
+OBJ_TUI_C    := $(patsubst $(SRC_DIR)/%.c, $(BUILD_DIR)/obj/%.o, $(SRC_TUI))
+OBJ_TUI_CPP  := $(patsubst $(SRC_DIR)/%.cpp, $(BUILD_DIR)/obj/%.o, $(SRC_TUI))
+OBJ_GCOV     := $(patsubst $(SRC_DIR)/%.c, $(BUILD_DIR)/gcov/%.o, $(SRC_TETRIS))
 
 # ================================
 # Targets
@@ -60,7 +61,7 @@ BAR_WIDTH  := $(shell expr $(TERM_WIDTH) \* 80 / 100 - 20)
 
 TOTAL_TETRIS := $(words $(OBJ_TETRIS))
 TOTAL_SNAKE  := $(words $(OBJ_SNAKE))
-TOTAL_TUI    := $(words $(OBJ_TUI))
+TOTAL_TUI    := $(words $(OBJ_TUI_C) $(OBJ_TUI_CPP))
 TOTAL_GCOV   := $(words $(OBJ_GCOV))
 DONE_TETRIS  := 0
 DONE_SNAKE   := 0
@@ -106,14 +107,20 @@ $(SNAKE): mkbuild $(OBJ_SNAKE)
 	@ar rcs $@ $(OBJ_SNAKE)
 
 # ---------------- TUI ----------------
+$(BUILD_DIR)/obj/tui/%.o: $(TUI_DIR)/%.c
+	@mkdir -p $(dir $@)
+	@$(CC) $(TUI_HEADERS) $(TETRIS_HEADERS) $(SNAKE_HEADERS) $(CFLAGS) -c $< -o $@
+	$(eval DONE_TUI := $(shell expr $(DONE_TUI) + 1))
+	@$(call print_bar,$(DONE_TUI),$(TOTAL_TUI),TUI compilation: )
+
 $(BUILD_DIR)/obj/tui/%.o: $(TUI_DIR)/%.cpp
 	@mkdir -p $(dir $@)
 	@$(CC) $(TUI_HEADERS) $(TETRIS_HEADERS) $(SNAKE_HEADERS) $(CFLAGS) -c $< -o $@
 	$(eval DONE_TUI := $(shell expr $(DONE_TUI) + 1))
 	@$(call print_bar,$(DONE_TUI),$(TOTAL_TUI),TUI compilation: )
 
-$(TUI): mkbuild $(OBJ_TUI)
-	@ar rcs $@ $(OBJ_TUI)
+$(TUI): mkbuild $(OBJ_TUI_C) $(OBJ_TUI_CPP)
+	@ar rcs $@ $(OBJ_TUI_C) $(OBJ_TUI_CPP)
 
 # ---------------- Install ----------------
 install: $(TETRIS) $(SNAKE) $(TUI)

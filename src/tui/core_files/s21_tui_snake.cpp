@@ -17,7 +17,7 @@ static void draw_block(WINDOW* w, int y, int x, int color_pair) {
   wattroff(w, COLOR_PAIR(color_pair) | A_REVERSE);
 }
 
-GameUI snake_init_ui() {
+SnakeUI snake_init_ui() {
   setlocale(LC_ALL, "");
   initscr();
   cbreak();
@@ -35,13 +35,13 @@ GameUI snake_init_ui() {
     init_pair(3, COLOR_RED, -1);     // яблоко
   }
 
-  GameUI ui;
+  SnakeUI ui;
   ui.field = newwin(snakeSize::ROWS + 2, snakeSize::COLS * 2 + 2, 1, 1);
   ui.counter = newwin(5, 20, 1, snakeSize::COLS * 2 + 4);
   return ui;
 }
 
-void snake_deinit_ui(GameUI* ui) {
+void snake_deinit_ui(SnakeUI* ui) {
   delwin(ui->field);
   delwin(ui->counter);
   endwin();
@@ -58,7 +58,7 @@ static void draw_scoreboard(WINDOW* counter, const Snake& snake) {
   wrefresh(counter);
 }
 
-void draw(GameUI* ui, const Snake& snake, const Apple& apple) {
+void draw(SnakeUI* ui, const Snake& snake, const Apple& apple) {
   werase(ui->field);
   draw_fancy_box(ui->field);
 
