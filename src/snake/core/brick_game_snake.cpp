@@ -51,10 +51,25 @@ void GameSnake::userInput(UserAction_s action, bool hold) {
   log_info("userInput called with action: %d", static_cast<int>(action));
   (void)hold;
 
+  if ((state == gameState::PAUSE && action != UserAction_s::Pause) ||
+      (state == gameState::GAME_OVER && action != UserAction_s::Start) ||
+      ((state == gameState::START) && action != UserAction_s::Start) ||
+      (state != gameState::START && state != gameState::GAME_OVER &&
+       action == UserAction_s::Start)) {
+    return;  // Ignore invalid actions for current state
+  }
+
   switch (action) {
     case UserAction_s::Start:
+      *this = GameSnake();
+      state = gameState::MOVING;
+      break;
     case UserAction_s::Pause:
+      state = state == gameState::PAUSE ? gameState::MOVING : gameState::PAUSE;
+      break;
     case UserAction_s::Terminate:
+      state = gameState::TERMINATED;
+      break;
     case UserAction_s::Left:
       dir = {-1, 0};
       break;
@@ -75,16 +90,19 @@ void GameSnake::userInput(UserAction_s action, bool hold) {
 }
 
 void GameSnake::updateCurrentState() {
-  CollisionType collision = snake.move(dir, apple);
-  switch (collision) {
-    case CollisionType::Wall:
-    case CollisionType::Self:
-      break;
-    case CollisionType::Apple:
-      apple = Apple();
-      ++score;
-      break;
-    default:
-      break;
+  if (state == gameState::MOVING) {
+    CollisionType collision = snake.move(dir, apple);
+    switch (collision) {
+      case CollisionType::Wall:
+      case CollisionType::Self:
+        state = gameState::GAME_OVER;
+        break;
+      case CollisionType::Apple:
+        apple = Apple();
+        ++score;
+        break;
+      default:
+        break;
+    }
   }
 }

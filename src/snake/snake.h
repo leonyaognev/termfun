@@ -21,7 +21,8 @@ enum class gameState {
   MOVING,     ///< Piece is falling.
   PAUSE,      ///< Game is paused.
   GAME_OVER,  ///< No more moves left.
-  START       ///< Waiting to start.
+  START,      ///< Waiting to start.
+  TERMINATED  ///< Exit game.
 };
 
 /// Class responsible for managing score, high score and game level
@@ -46,7 +47,7 @@ class GameSnake {
  public:
   Snake snake;
   Apple apple;
-  gameState state;  ///< Current game state
+  gameState state = gameState::START;  ///< Current game state
 
   void userInput(UserAction_s action, bool hold);
   void updateCurrentState();

@@ -11,15 +11,15 @@
 
 void snake() {
   SnakeUI ui = snake_init_ui();
-  GameSnake game;
+  static GameSnake game;
 
-  int run = 0;
-  while (!run) {
+  while (game.state != gameState::TERMINATED) {
     game.updateCurrentState();
     draw(&ui, game.snake, game.apple);
-    run = snake_recive_input(game);
+    snake_recive_input(game);
     std::this_thread::sleep_for(std::chrono::milliseconds(200));
   }
+  game.state = gameState::PAUSE;
 
   snake_deinit_ui(&ui);
 }
@@ -70,6 +70,7 @@ int main() {
     } else if (ch == 10 || ch == KEY_ENTER) {
       actions[highlight]();
     }
+    std::this_thread::sleep_for(std::chrono::milliseconds(20));
   }
 
   endwin();
