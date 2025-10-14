@@ -77,6 +77,27 @@ static void draw_controlbord(WINDOW* control) {
   wrefresh(control);
 }
 
+static void draw_state_messages(WINDOW* field, const gameState& state) {
+  switch (state) {
+    case gameState::GAME_OVER:
+      mvwaddstr(field, snakeSize::ROWS / 2, snakeSize::COLS - 5,
+                "[[GAME OVER]]");
+      mvwaddstr(field, snakeSize::ROWS / 2 + 1, snakeSize::COLS - 10,
+                "press ENTER to restart");
+      break;
+    case gameState::PAUSE:
+      mvwaddstr(field, snakeSize::ROWS / 2, snakeSize::COLS - 4, "[[PAUSE]]");
+      break;
+    case gameState::START:
+      mvwaddstr(field, snakeSize::ROWS / 2, snakeSize::COLS - 9,
+                "press ENTER to start");
+      break;
+    default:
+      break;
+  }
+  wattroff(field, COLOR_PAIR(7) | A_BOLD);
+}
+
 void draw(SnakeUI* ui, const GameSnake& game) {
   werase(ui->field);
   draw_fancy_box(ui->field);
@@ -91,6 +112,8 @@ void draw(SnakeUI* ui, const GameSnake& game) {
     draw_block(ui->field, p.y + 1, p.x * 2 + 1, color);
     first = false;
   }
+
+  draw_state_messages(ui->field, game.state);
 
   wrefresh(ui->field);
   draw_scoreboard(ui->counter, game);

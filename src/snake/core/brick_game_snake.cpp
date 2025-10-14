@@ -85,7 +85,8 @@ void GameSnake::userInput(UserAction_s action, bool hold) {
   switch (action) {
     case UserAction_s::Start:
       if (state == gameState::START || state == gameState::GAME_OVER) {
-        *this = GameSnake();       /**< Restart the game */
+        if (state == gameState::GAME_OVER)
+          *this = GameSnake();     /**< Restart the game */
         state = gameState::MOVING; /**< Start moving */
         log_info("Game started");
       } else {
