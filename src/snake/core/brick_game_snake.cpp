@@ -106,22 +106,22 @@ void GameSnake::userInput(UserAction_s action, bool hold) {
       break;
 
     case UserAction_s::Left:
-      if (state == gameState::MOVING) dir = {-1, 0};
+      if (state == gameState::MOVING && dir.x + (-1) != 0) dir = {-1, 0};
       log_trace("Direction set to LEFT");
       break;
 
     case UserAction_s::Right:
-      if (state == gameState::MOVING) dir = {1, 0};
+      if (state == gameState::MOVING && dir.x + 1 != 0) dir = {1, 0};
       log_trace("Direction set to RIGHT");
       break;
 
     case UserAction_s::Up:
-      if (state == gameState::MOVING) dir = {0, -1};
+      if (state == gameState::MOVING && dir.y + (-1) != 0) dir = {0, -1};
       log_trace("Direction set to UP");
       break;
 
     case UserAction_s::Down:
-      if (state == gameState::MOVING) dir = {0, 1};
+      if (state == gameState::MOVING && dir.y + 1 != 0) dir = {0, 1};
       log_trace("Direction set to DOWN");
       break;
 

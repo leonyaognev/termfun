@@ -19,7 +19,7 @@ void snake() {
     snake_recive_input(game);
     std::this_thread::sleep_for(std::chrono::milliseconds(200));
   }
-  game.state = gameState::PAUSE;
+  game.state = gameState::MOVING;
 
   snake_deinit_ui(&ui);
 }
