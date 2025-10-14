@@ -4,6 +4,8 @@ project(tetris_snake LANGUAGES C CXX)
 # ------------------------------
 # Компиляторы и флаги
 # ------------------------------
+set(CMAKE_C_COMPILER g++)
+set(CMAKE_CXX_COMPILER g++)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
@@ -35,8 +37,6 @@ set(TUI_SRC
     src/tui/helpers/s21_tetris_input.c
 )
 
-add_library(tui_lib STATIC ${TUI_SRC})
-
 # ------------------------------
 # Заголовочные пути
 # ------------------------------
@@ -61,8 +61,8 @@ add_library(tui_lib STATIC ${TUI_SRC})
 # ------------------------------
 # Исполняемый файл
 # ------------------------------
-add_executable(tetris_app tetris/main.cpp)
-target_link_libraries(tetris_app PRIVATE tetris_lib snake_lib tui_lib ncurses)
+add_executable(termfun tetris/main.cpp)
+target_link_libraries(termfun PRIVATE tui_lib tetris_lib snake_lib ncurses)
 
 # ------------------------------
 # Тесты (если нужны)

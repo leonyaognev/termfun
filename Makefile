@@ -131,7 +131,7 @@ install: compile_logger $(TETRIS) $(SNAKE) $(TUI)
 		-L$(BUILD_DIR)/ -l:s21_tetris_logics_lib.a \
 		-L$(BUILD_DIR)/ -l:s21_snake_lib.a \
 		-L./src/vendor/logger/ -l:liblogger.a \
-		-lncurses -o ./build/tetris
+		-lncurses -o ./build/termfun
 
 uninstall:
 	@rm -rf ~/.cache/termfun
