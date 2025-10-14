@@ -49,13 +49,13 @@ class Apple {
    * @brief Get the X coordinate of the apple.
    * @return X position
    */
-  inline int getX() const noexcept { return x; }
+  int getX() const noexcept { return x; }
 
   /**
    * @brief Get the Y coordinate of the apple.
    * @return Y position
    */
-  inline int getY() const noexcept { return y; }
+  int getY() const noexcept { return y; }
 };
 
 /**
@@ -115,11 +115,17 @@ class Snake {
    * @brief Get the full body of the snake.
    * @return Deque of snake body points
    */
-  inline std::deque<point> getBody() const noexcept { return body; }
+  std::deque<point> getBody() const noexcept { return body; }
 
   /**
    * @brief Get the position of the snake's head.
    * @return Point representing the head position
    */
-  inline point getHead() const noexcept { return body.front(); }
+  point getHead() const noexcept { return body.front(); }
+
+  /**
+   * @bref get the length snake
+   * @return length
+   */
+  int getLength() const noexcept { return body.size(); }
 };

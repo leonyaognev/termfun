@@ -3,6 +3,7 @@
 #include <chrono>
 
 #include "snake.h"
+#include "snake_core.h"
 #include "snake_tui.h"
 
 static void draw_fancy_box(WINDOW* w) {
@@ -38,6 +39,7 @@ SnakeUI snake_init_ui() {
   SnakeUI ui;
   ui.field = newwin(snakeSize::ROWS + 2, snakeSize::COLS * 2 + 2, 1, 1);
   ui.counter = newwin(5, 20, 1, snakeSize::COLS * 2 + 4);
+  ui.control = newwin(7, 37, 7, snakeSize::COLS * 2 + 4);
   return ui;
 }
 
@@ -47,32 +49,50 @@ void snake_deinit_ui(SnakeUI* ui) {
   endwin();
 }
 
-static void draw_scoreboard(WINDOW* counter, const Snake& snake) {
+static void draw_scoreboard(WINDOW* counter, const GameSnake& snake) {
   werase(counter);
   draw_fancy_box(counter);
 
   wattron(counter, COLOR_PAIR(3) | A_BOLD);
-  mvwprintw(counter, 1, 2, "Length: %d", (int)snake.getBody().size());
+  mvwprintw(counter, 1, 2, "Level: %d", (int)snake.score.level);
+  mvwprintw(counter, 2, 2, "Length: %d", snake.score.score);
+  mvwprintw(counter, 3, 2, "Max length: %d", (int)snake.score.highScore);
   wattroff(counter, COLOR_PAIR(3) | A_BOLD);
 
   wrefresh(counter);
 }
 
-void draw(SnakeUI* ui, const Snake& snake, const Apple& apple) {
+static void draw_controlbord(WINDOW* control) {
+  werase(control);
+  draw_fancy_box(control);
+
+  wattron(control, COLOR_PAIR(3) | A_BOLD);
+  mvwprintw(control, 1, 2, "'enter' - start/restart game");
+  mvwprintw(control, 2, 2, "'esc' - pause");
+  mvwprintw(control, 3, 2, "'q/Q' - exit game");
+  mvwprintw(control, 4, 2, "'arrows' - movement");
+  mvwprintw(control, 5, 2, "'space' - one-time speed increase");
+  wattroff(control, COLOR_PAIR(3) | A_BOLD);
+
+  wrefresh(control);
+}
+
+void draw(SnakeUI* ui, const GameSnake& game) {
   werase(ui->field);
   draw_fancy_box(ui->field);
 
   // Яблоко
-  draw_block(ui->field, apple.getY() + 1, apple.getX() * 2 + 1, 3);
+  draw_block(ui->field, game.apple.getY() + 1, game.apple.getX() * 2 + 1, 3);
 
   // Змейка
   bool first = true;
-  for (auto& p : snake.getBody()) {
+  for (auto& p : game.snake.getBody()) {
     int color = first ? 1 : 2;
     draw_block(ui->field, p.y + 1, p.x * 2 + 1, color);
     first = false;
   }
 
   wrefresh(ui->field);
-  draw_scoreboard(ui->counter, snake);
+  draw_scoreboard(ui->counter, game);
+  draw_controlbord(ui->control);
 }

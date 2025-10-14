@@ -1,8 +1,10 @@
+MAKEFLAGS += --no-print-directory
 # ================================
 # Compiler & Flags
 # ================================
-CC          = gcc
-CFLAGS      = -Wall -Wextra -Werror -x c++ -std=c++20 -lstdc++
+DEBUG_LEVEL ?= 2
+CC          = g++ -DDEBUG_LEVEL=$(DEBUG_LEVEL)
+CFLAGS      = -Wall -Wextra -Werror -std=c++20
 GCOV_FLAGS  = -fprofile-arcs -ftest-coverage -I./src/test/include/
 
 OS := $(shell uname -s)
@@ -84,7 +86,7 @@ endef
 # ================================
 # Rules
 # ================================
-all: install gcov_report valgrind_test dvi dist
+all: compile_logger install gcov_report valgrind_test dvi dist
 
 # ---------------- TETRIS ----------------
 $(BUILD_DIR)/obj/tetris/%.o: $(TETRIS_DIR)/%.c
@@ -123,15 +125,16 @@ $(TUI): mkbuild $(OBJ_TUI_C) $(OBJ_TUI_CPP)
 	@ar rcs $@ $(OBJ_TUI_C) $(OBJ_TUI_CPP)
 
 # ---------------- Install ----------------
-install: $(TETRIS) $(SNAKE) $(TUI)
+install: compile_logger $(TETRIS) $(SNAKE) $(TUI)
 	@$(CC) $(CFLAGS) $(TETRIS_HEADERS) $(TUI_HEADERS) $(SNAKE_HEADERS) ./tetris/main.cpp \
 		-L$(BUILD_DIR)/ -l:s21_tui_lib.a \
 		-L$(BUILD_DIR)/ -l:s21_tetris_logics_lib.a \
 		-L$(BUILD_DIR)/ -l:s21_snake_lib.a \
+		-L./src/vendor/logger/ -l:liblogger.a \
 		-lncurses -o ./build/tetris
 
 uninstall:
-	@rm -rf ~/.cache/tetris
+	@rm -rf ~/.cache/termfun
 	@rm -rf ./build/tetris
 
 # ---------------- Tests & Coverage ----------------
@@ -203,6 +206,12 @@ dist: mkbuild
 clean:
 	@rm -rf $(BUILD_DIR)
 	@rm -rf ./app.log ./best_score.bin
+
+compile_logger: init_submodules
+	@$(MAKE) -C ./src/vendor/logger
+
+init_submodules:
+	@git submodule update --init --recursive > /dev/null 2>&1
 
 rebuild: clean all
 

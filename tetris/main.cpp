@@ -15,7 +15,7 @@ void snake() {
 
   while (game.state != gameState::TERMINATED) {
     game.updateCurrentState();
-    draw(&ui, game.snake, game.apple);
+    draw(&ui, game);
     snake_recive_input(game);
     std::this_thread::sleep_for(std::chrono::milliseconds(200));
   }

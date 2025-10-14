@@ -20,8 +20,16 @@ scoreManager::scoreManager() : score(0), highScore(0), level(0), speed(1) {
   /** Try to open the file with the best score */
   std::ifstream in(file, std::ios::binary);
   if (!in) {
-    log_warn("Error opening file to read best result.");
-    throw std::runtime_error("Error opening file.");
+    log_warn("File not found, creating new score file.");
+    highScore = 0;
+
+    /** Create new score file to read best score*/
+    std::ofstream out(file, std::ios::binary);
+    if (!out) {
+      throw std::runtime_error("Failed to create score file.");
+    }
+    out.write(reinterpret_cast<const char*>(&highScore), sizeof(highScore));
+    return;
   }
 
   /** Read best score, if failed set to 0 */
@@ -66,53 +74,64 @@ void GameSnake::userInput(UserAction_s action, bool hold) {
   log_info("userInput called with action: %d", static_cast<int>(action));
   (void)hold;
 
-  /** Validate action against current game state */
-  if ((state == gameState::PAUSE && action != UserAction_s::Pause) ||
-      (state == gameState::GAME_OVER && action != UserAction_s::Start) ||
-      ((state == gameState::START) && action != UserAction_s::Start) ||
-      (state != gameState::START && state != gameState::GAME_OVER &&
-       action == UserAction_s::Start)) {
-    log_warn("Invalid action %d for current state %d", static_cast<int>(action),
-             static_cast<int>(state));
-    return;  ///< Ignore invalid actions
+  /** Terminate works in any state */
+  if (action == UserAction_s::Terminate) {
+    state = gameState::TERMINATED;
+    log_info("Game terminated by player");
+    return;
   }
 
   /** Handle player actions */
   switch (action) {
     case UserAction_s::Start:
-      *this = GameSnake();       /**< Restart the game */
-      state = gameState::MOVING; /**< Start moving */
-      log_info("Game started");
+      if (state == gameState::START || state == gameState::GAME_OVER) {
+        *this = GameSnake();       /**< Restart the game */
+        state = gameState::MOVING; /**< Start moving */
+        log_info("Game started");
+      } else {
+        log_warn("Cannot start game in state %d", static_cast<int>(state));
+      }
       break;
+
     case UserAction_s::Pause:
-      state = state == gameState::PAUSE ? gameState::MOVING : gameState::PAUSE;
-      log_info("Game %s", state == gameState::PAUSE ? "paused" : "resumed");
+      if (state == gameState::MOVING || state == gameState::PAUSE) {
+        state =
+            (state == gameState::PAUSE) ? gameState::MOVING : gameState::PAUSE;
+        log_info("Game %s", state == gameState::PAUSE ? "paused" : "resumed");
+      } else {
+        log_warn("Cannot pause/resume game in state %d",
+                 static_cast<int>(state));
+      }
       break;
-    case UserAction_s::Terminate:
-      state = gameState::TERMINATED;
-      log_info("Game terminated by player");
-      break;
+
     case UserAction_s::Left:
-      dir = {-1, 0};
+      if (state == gameState::MOVING) dir = {-1, 0};
       log_trace("Direction set to LEFT");
       break;
+
     case UserAction_s::Right:
-      dir = {1, 0};
+      if (state == gameState::MOVING) dir = {1, 0};
       log_trace("Direction set to RIGHT");
       break;
+
     case UserAction_s::Up:
-      dir = {0, -1};
+      if (state == gameState::MOVING) dir = {0, -1};
       log_trace("Direction set to UP");
       break;
+
     case UserAction_s::Down:
-      dir = {0, 1};
+      if (state == gameState::MOVING) dir = {0, 1};
       log_trace("Direction set to DOWN");
       break;
+
     case UserAction_s::Action:
+      updateCurrentState();
       log_info("Action button pressed (no effect)");
       break;
+
     default:
       log_warn("Incorrect action received: %d", static_cast<int>(action));
+      break;
   }
 }
 

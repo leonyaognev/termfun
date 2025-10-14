@@ -76,6 +76,7 @@ class GameSnake {
  public:
   Snake snake;                        /**< Snake instance */
   Apple apple;                        /**< Apple instance */
+  scoreManager score;                 /**< Score manager instance */
   gameState state = gameState::START; /**< Current game state */
 
   /**
@@ -94,6 +95,5 @@ class GameSnake {
   void updateCurrentState();
 
  private:
-  scoreManager score;        /**< Score manager instance */
   Snake::point dir = {1, 0}; /**< Current snake direction vector */
 };
