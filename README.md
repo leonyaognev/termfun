@@ -1,6 +1,6 @@
-# Проект Tetris на C
+# Проект termfun
 
-Терминальная игра Tetris на языке C с использованием `ncurses`, модульной архитектурой и полной поддержкой тестирования и покрытия кода.
+Терминальные игры (Tetris и Snake) на языке C++ с использованием `ncurses`, модульной архитектурой и полной поддержкой тестирования и покрытия кода.
 
 ---
 
@@ -24,6 +24,7 @@
 ## Особенности
 
 - Классический Tetris с семью тетромино (`I, O, T, L, J, S, Z`).
+- Игра Snake.
 - Движение, вращение, жёсткое падение и пауза.
 - Отслеживание очков, уровня и рекорда.
 - Терминальный интерфейс на `ncurses`.
@@ -36,7 +37,8 @@
 
 ## Требования
 
-- **Компилятор C:** `gcc`
+- **Компилятор C++:** `g++`
+- **Стандарт:** C++20
 - **Библиотеки:** `ncurses`, `check`
 - **Инструменты:** `make`, `lcov`, `genhtml`, `valgrind` (Linux) или `leaks` (macOS)
 - Рекомендуется POSIX-совместимая среда (Linux/macOS)
@@ -44,41 +46,56 @@
 ---
 
 ## Структура проекта
+
 ```
 .
-├── compile_commands.json
 ├── Doxyfile
 ├── Makefile
 ├── README.md
-├── src
-│   ├── tetris
-│   │   ├── core_files
-│   │   │   ├── figure
-│   │   │   │   ├── core
-│   │   │   │   │   └── s21_figures.c
-│   │   │   │   └── include
-│   │   │   │       └── s21_figures.h
-│   │   │   ├── s21_brickgame_tetris.c
-│   │   │   ├── s21_check_line.c
-│   │   │   ├── s21_tetris_logics.c
-│   │   │   └── s21_tetris_step.c
-│   │   ├── include
-│   │   │   ├── s21_tetris_logics.h
-│   │   │   └── s21_tetris_running.h
-│   │   └── s21_tetris.h
-│   └── tui
-│       ├── core_files
-│       │   └── s21_tui.c
-│       ├── helpers
-│       │   └── s21_tetris_input.c
-│       └── s21_tui.h
+├── tetris
+│   └── main.cpp
 ├── test
-│   └── test.c
-└── tetris
-    └── main.c
+│   └── test.c
+└── src
+    ├── snake
+    │   ├── core
+    │   │   ├── brick_game_snake.cpp
+    │   │   └── snake.cpp
+    │   ├── helpers
+    │   │   └── helpers.cpp
+    │   └── include
+    │       └── s21_snake.h
+    ├── tetris
+    │   ├── core_files
+    │   │   ├── figure
+    │   │   │   ├── core
+    │   │   │   │   └── s21_figures.c
+    │   │   │   └── include
+    │   │   │       └── s21_figures.h
+    │   │   ├── s21_brickgame_tetris.c
+    │   │   ├── s21_check_line.c
+    │   │   ├── s21_tetris_logics.c
+    │   │   └── s21_tetris_step.c
+    │   ├── include
+    │   │   ├── s21_tetris_logics.h
+    │   │   └── s21_tetris_running.h
+    │   └── s21_tetris.h
+    ├── tui
+    │   ├── core_files
+    │   │   ├── s21_tui_tetris.c
+    │   │   └── s21_tui_snake.cpp
+    │   ├── helpers
+    │   │   ├── s21_tetris_input.c
+    │   │   └── s21_snake_input.cpp
+    │   └── s21_tui.h
+    └── vendor
+        └── logger
 ```
+
 ---
+
 ## Диаграмма клеточного автомата
+
 ```mermaid
 stateDiagram-v2
     [*] --> Start: запуск игры
@@ -103,22 +120,23 @@ stateDiagram-v2
 
 ```bash
 make all
-````
+```
 
 Компилирует:
 
-* Логику Tetris: `build/s21_tetris_logics_lib.a`
-* Интерфейс TUI: `build/s21_tui_lib.a`
-* Библиотеку для покрытия: `build/s21_tetris_logics_gcov.a`
-* Устанавливает исполняемый файл `/usr/bin/tetris`.
+- Логику Tetris: `build/s21_tetris_logics_lib.a`
+- Логику Snake: `build/s21_snake_lib.a`
+- Интерфейс TUI: `build/s21_tui_lib.a`
+- Библиотеку для покрытия: `build/s21_tetris_logics_gcov.a`
+- Создаёт исполняемый файл `build/termfun`.
 
-Установка без ручной сборки:
+Сборка без тестов и документации:
 
 ```bash
 make install
 ```
 
-Удаление игры и кеша:
+Удаление кеша:
 
 ```bash
 make uninstall
@@ -128,21 +146,27 @@ make uninstall
 
 ## Запуск игры
 
-После установки:
+После сборки:
 
 ```bash
-tetris
+./build/termfun
 ```
 
-Управление:
+Управление (Tetris):
 
-* **Стрелки:** движение и вращение
-* **Вниз:** мягкое падение
-* **Вверх:** вращение
-* **Пробел/Action:** жёсткое падение
-* **ESC:** пауза
-* **Q:** выйти/завершить игру
-* **Enter:** старт/перезапуск игры
+- **Стрелки:** движение
+- **Вниз:** мягкое падение
+- **Вверх:** вращение
+- **Пробел:** жёсткое падение
+- **ESC:** пауза
+- **Enter:** старт/перезапуск игры
+- **Q:** выход
+
+Управление (Snake):
+
+- **Стрелки:** движение
+- **Enter:** старт/перезапуск игры
+- **Q:** выход
 
 ---
 
@@ -182,8 +206,8 @@ build/coverage_html/index.html
 make valgrind_test
 ```
 
-* Используется `valgrind` на Linux.
-* Используется `leaks` на macOS.
+- Используется `valgrind` на Linux.
+- Используется `leaks` на macOS.
 
 ---
 
@@ -221,13 +245,13 @@ build/dist/tetris.tar.gz
 
 ## Обслуживание
 
-* Очистка артефактов сборки:
+- Очистка артефактов сборки:
 
 ```bash
 make clean
 ```
 
-* Полная пересборка проекта:
+- Полная пересборка проекта:
 
 ```bash
 make rebuild

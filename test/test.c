@@ -19,7 +19,7 @@ static void rotate_up(void) { userInput(Up, false); }
 static void hard_drop(void) { userInput(Action, false); }
 
 // Simple invariant checks, which should almost always hold
-static void assert_basic_invariants(const GameInfo_t *info) {
+static void assert_basic_invariants(const GameInfo_t* info) {
   ck_assert_msg(info->score >= 0, "score < 0");
   ck_assert_msg(info->high_score >= 0, "high_score < 0");
   ck_assert_msg(info->level >= 0, "level < 0");
@@ -292,9 +292,9 @@ START_TEST(test_score_non_negative_under_massive_drops) {
 }
 END_TEST
 
-Suite *tetris_suite(void) {
-  Suite *s = suite_create("s21_tetris");
-  TCase *tc_core = tcase_create("core");
+Suite* tetris_suite(void) {
+  Suite* s = suite_create("s21_tetris");
+  TCase* tc_core = tcase_create("core");
 
   // Core tests
   tcase_add_test(tc_core, test_start_sets_state_and_invariants);
@@ -336,8 +336,8 @@ Suite *tetris_suite(void) {
 
 int main(void) {
   int number_failed;
-  Suite *s = tetris_suite();
-  SRunner *sr = srunner_create(s);
+  Suite* s = tetris_suite();
+  SRunner* sr = srunner_create(s);
 
   srunner_set_fork_status(sr, CK_NOFORK);
   srunner_run_all(sr, CK_NORMAL);

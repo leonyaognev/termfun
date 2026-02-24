@@ -126,16 +126,16 @@ $(TUI): mkbuild $(OBJ_TUI_C) $(OBJ_TUI_CPP)
 
 # ---------------- Install ----------------
 install: compile_logger $(TETRIS) $(SNAKE) $(TUI)
-	@$(CC) $(CFLAGS) $(TETRIS_HEADERS) $(TUI_HEADERS) $(SNAKE_HEADERS) ./tetris/main.cpp \
+	@sudo $(CC) $(CFLAGS) $(TETRIS_HEADERS) $(TUI_HEADERS) $(SNAKE_HEADERS) ./tetris/main.cpp \
 		-L$(BUILD_DIR)/ -l:s21_tui_lib.a \
 		-L$(BUILD_DIR)/ -l:s21_tetris_logics_lib.a \
 		-L$(BUILD_DIR)/ -l:s21_snake_lib.a \
 		-L./src/vendor/logger/ -l:liblogger.a \
-		-lncurses -o ./build/termfun
+		-lncurses -o /sbin/termfun
 
 uninstall:
 	@rm -rf ~/.cache/termfun
-	@rm -rf ./build/tetris
+	sudo @rm -rf /sbin/termfun
 
 # ---------------- Tests & Coverage ----------------
 mkbuild:

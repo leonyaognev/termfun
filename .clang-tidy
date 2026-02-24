@@ -1,0 +1,5 @@
+Checks: 'readability-function-cognitive-complexity'
+CheckOptions:
+  - key: readability-function-cognitive-complexity.Threshold
+    value: '7'
+WarningsAsErrors: '*'   # вот эта хуета превращает все варнинги в ошибки
